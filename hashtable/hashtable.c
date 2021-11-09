@@ -33,7 +33,7 @@ int get_hash(char *key) {
  */
 void ht_init(ht_table_t *table) {
     int i;
-    for (i = 0; i < HT_SIZE; i++)
+    for (i = 0; i < HT_SIZE; i++) //všechny ukazetele na hodnotu NULL
     {
         (*table)[i] = NULL;
     }
@@ -46,16 +46,16 @@ void ht_init(ht_table_t *table) {
  * hodnotu NULL.
  */
 ht_item_t *ht_search(ht_table_t *table, char *key) {
-    ht_item_t *item = (*table)[get_hash(key)];
+    ht_item_t *item = (*table)[get_hash(key)]; //položka na indexu key
 
-    for (; item; item = item->next)
+    for (; item; item = item->next) //hledání klíče
     {
-          if(strcmp(key, item->key) == 0)
+          if(strcmp(key, item->key) == 0)   //porovnání klíče
         {
-              return item;
+              return item;  //vrácení ukazatele na prvek
         }
     }
-    return NULL;
+    return NULL;    //nenalezen
 }
 
 /*
@@ -67,29 +67,30 @@ ht_item_t *ht_search(ht_table_t *table, char *key) {
  * synonym zvoľte najefektívnejšiu možnosť a vložte prvok na začiatok zoznamu.
  */
 void ht_insert(ht_table_t *table, char *key, float value) {
-    ht_item_t *item = ht_search(table, key);
-    if (item)
+    ht_item_t *item = ht_search(table, key);    //hledání prvku s klíčem key
+
+    if (item)   //pokud už takový je aktualizuje se datová část
     {
         item->value = value;
         return;
     }
 
-    ht_item_t *NEWitem = (ht_item_t *) malloc(sizeof (ht_item_t));
+    ht_item_t *NEWitem = (ht_item_t *) malloc(sizeof (ht_item_t));  //nová položka s klíčem key
     if(NEWitem == NULL)
     {
-        return;
+        return; //malloc neuspěl
     }
     NEWitem->key = key;
     NEWitem->value = value;
     NEWitem->next = NULL;
-    int hashtag = get_hash(key);
+    int hashtag = get_hash(key);    //získání hashe klíče key
 
-    if((item = (*table)[hashtag]))
+    if((item = (*table)[hashtag]))  //pokud existují synonyma, tak je připojíme za nový prvek
     {
         NEWitem->next = item;
     }
 
-    (*table)[hashtag] = NEWitem;
+    (*table)[hashtag] = NEWitem;    //uložení nového prvku
 }
 
 /*
@@ -101,8 +102,8 @@ void ht_insert(ht_table_t *table, char *key, float value) {
  * Pri implementácii využite funkciu ht_search.
  */
 float *ht_get(ht_table_t *table, char *key) {
-    ht_item_t *item = ht_search(table, key);
-    return item ? &(item->value) : NULL;
+    ht_item_t *item = ht_search(table, key);    //hledání prvku s klíčem key
+    return item ? &(item->value) : NULL;    //pokud existuje, vrátí se data, pokud ne, tak NULL
 }
 
 /*
@@ -114,10 +115,29 @@ float *ht_get(ht_table_t *table, char *key) {
  * Pri implementácii NEVYUŽÍVAJTE funkciu ht_search.
  */
 void ht_delete(ht_table_t *table, char *key) {
-    int hashtag = get_hash(key);
-    ht_item_t *item = (*table)[hashtag];
+    int hashtag = get_hash(key);    //získání hashe klíče
+    ht_item_t *item = (*table)[hashtag];    //prvek na daném indexu
     ht_item_t *PREVitem = NULL;
     ht_item_t *NEXTitem = NULL;
+
+    for(; item; PREVitem = item, item = item->next) //hledá se klíč v synonymech daného klíče
+    {
+        NEXTitem = item->next;  //uložení ukazatele na následující prvek
+
+        if(strcmp(key, item->key) == 0) //porovnání
+        {
+            free(item); //uvolnění
+
+            if(!PREVitem)   //byl na začátku seznamu
+            {
+                (*table)[hashtag] = NEXTitem;
+                return;
+            }
+
+            PREVitem->next = NEXTitem; //byl uprostřed seznamu
+            return;
+        }
+    }
 }
 
 /*
@@ -127,4 +147,19 @@ void ht_delete(ht_table_t *table, char *key) {
  * inicializácii.
  */
 void ht_delete_all(ht_table_t *table) {
+    ht_item_t *item;
+    ht_item_t *DELETEitem;
+
+    int i;
+    for (i = 0; i < HT_SIZE; i++)   //všechny indexy
+    {
+        item = (*table)[i];
+        while (item)    //všechny prvky
+        {
+            DELETEitem = item;
+            item = item->next;
+            free(DELETEitem);   //uvolnění
+        }
+        (*table)[i] = NULL; //nastavení na daném indexu na NULL
+    }
 }

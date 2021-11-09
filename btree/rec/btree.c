@@ -17,7 +17,7 @@
  * leak). Keďže neinicializovaný ukazovateľ má nedefinovanú hodnotu, nie je
  * možné toto detegovať vo funkcii.
  */
-void bst_init(bst_node_t **tree) {
+void bst_init(bst_node_t **tree){
 }
 
 /*
@@ -30,6 +30,14 @@ void bst_init(bst_node_t **tree) {
  * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
  */
 bool bst_search(bst_node_t *tree, char key, int *value) {
+    if(tree == NULL)
+    {
+        return false;
+    }
+    else
+    {
+        if (tree)
+    }
   return false;
 }
 

@@ -20,6 +20,7 @@
  * možné toto detegovať vo funkcii.
  */
 void bst_init(bst_node_t **tree) {
+    *tree = NULL;
 }
 
 /*
@@ -47,6 +48,51 @@ bool bst_search(bst_node_t *tree, char key, int *value) {
  * Funkciu implementujte iteratívne bez použitia vlastných pomocných funkcií.
  */
 void bst_insert(bst_node_t **tree, char key, int value) {
+    bst_node_t *after = NULL;
+    bst_node_t *iterator = *tree;
+
+    while (iterator)
+    {
+        after = iterator;
+
+        if(value < iterator->value)
+        {
+            iterator = iterator->left;
+            continue;
+        }
+
+        if (value > iterator->value)
+        {
+            iterator = iterator->right;
+            continue;
+        }
+
+        return;
+    }
+
+    bst_node_t *NEWnode = (bst_node_t *) malloc(sizeof (struct bst_node));
+    if (NEWnode == NULL)
+    {
+        return;
+    }
+
+    NEWnode->value = value;
+    NEWnode->left = NULL;
+    NEWnode->right = NULL;
+
+    if (!after)
+    {
+        *tree = NEWnode;
+        return;
+    }
+
+    if (value < after->value)
+    {
+        after->left= NEWnode;
+        return;
+    }
+
+    after->right = NEWnode;
 }
 
 /*

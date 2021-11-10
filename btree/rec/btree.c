@@ -18,6 +18,7 @@
  * možné toto detegovať vo funkcii.
  */
 void bst_init(bst_node_t **tree){
+    *tree = NULL;
 }
 
 /*
@@ -34,25 +35,18 @@ bool bst_search(bst_node_t *tree, char key, int *value) {
     {
         return false;
     }
-    else
+
+    if (tree->key == key)
     {
-        if (tree->key == key)
-        {
-            *value = tree->value;
-            return true;
-        }
-        else
-        {
-            if (key < tree->key)
-            {
-                return bst_search(tree->left, key, value);
-            }
-            else
-            {
-                return bst_search(tree->right, key, value);
-            }
-        }
+        *value = tree->value;
+        return true;
     }
+    if (key < tree->key)
+    {
+        return bst_search(tree->left, key, value);
+    }
+
+    return bst_search(tree->right, key, value);
 }
 
 /*
@@ -67,38 +61,32 @@ bool bst_search(bst_node_t *tree, char key, int *value) {
  * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
  */
 void bst_insert(bst_node_t **tree, char key, int value) {
-    bst_node_t *NEWnode = (bst_node_t *) malloc(sizeof(bst_node_t));
-    if (NEWnode == NULL)
+    if(!*tree)
     {
-        return;
-    }
-
-    NEWnode->key = key;
-    NEWnode->value = value;
-    NEWnode->left = NULL;
-    NEWnode->right = NULL;
-
-    if ((*tree) == NULL)
-    {
-        return;
-    }
-    else
-    {
-        if (NEWnode->key < (*tree)->key)
+        *tree = (bst_node_t *) malloc(sizeof(bst_node_t));
+        if (!(*tree))
         {
-            bst_insert(&(*tree)->left, NEWnode->key, value);
+            return;
         }
-        else
+
+        (*tree)->key = key;
+        (*tree)->value = value;
+        (*tree)->left = NULL;
+        (*tree)->right = NULL;
+
+        if ((*tree)->key == key)
         {
-            if ((*tree)->key < key)
-            {
-                bst_insert(&(*tree)->right, NEWnode->key, value);
-            }
-            else
-            {
-                (*tree)->value = value;
-            }
+            (*tree)->value = value;
+            return;
         }
+
+        if ((*tree)->key > key)
+        {
+            bst_insert(&((*tree)->left), key, value);
+            return;
+        }
+
+        bst_insert(&((*tree)->right), key, value);
     }
 }
 
@@ -116,7 +104,23 @@ void bst_insert(bst_node_t **tree, char key, int value) {
  * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
  */
 void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
+    bst_node_t *right_node;
 
+    if((*tree)->right == NULL)
+    {
+        right_node = *tree;
+
+        target->key = right_node->key;
+        target->value = right_node->value;
+
+        target->left =NULL;
+        if (right_node->left)
+        {
+            target->left = right_node->left;
+        }
+
+        free(right_node);
+    }
 }
 
 /*
@@ -137,21 +141,96 @@ void bst_delete(bst_node_t **tree, char key) {
         return;
     }
 
+    bst_node_t *DELnode;
+
+    if (key < (*tree)->key)
+    {
+        if ((*tree)->left && (*tree)->left->key == key)
+        {
+            DELnode = (*tree)->left;
+
+            if (DELnode->left && DELnode->right)
+            {
+                bst_replace_by_rightmost(DELnode, &(DELnode->left));
+                return;
+            }
+
+            if (DELnode->left && !DELnode->right)
+            {
+                (*tree)->left = DELnode->left;
+            }
+            else if (!DELnode->left && DELnode->right)
+            {
+                (*tree)->left = DELnode->right;
+            }
+            else
+            {
+                (*tree)->left = NULL;
+            }
+
+            free(DELnode);
+            return;
+        }
+
+        bst_delete(&((*tree)->left), key);
+        return;
+    }
+
     if (key > (*tree)->key)
     {
-        bst_delete(&(*tree)->right, key);
+        if ((*tree)->right && (*tree)->right->key == key)
+        {
+            DELnode = (*tree)->right;
+
+            if (DELnode->left && DELnode->right)
+            {
+                bst_replace_by_rightmost(DELnode, &(DELnode->left));
+                return;
+            }
+
+            if (DELnode->left && !DELnode->right)
+            {
+                (*tree)->right = DELnode->left;
+            }
+            else if (!DELnode->left && DELnode->right)
+            {
+                (*tree)->right = DELnode->right;
+            }
+            else
+            {
+                (*tree)->right = NULL;
+            }
+
+            free(DELnode);
+            return;
+        }
+
+        bst_delete(&((*tree)->right), key);
+        return;
     }
-    else if ((*tree)->key > key)
+
+    DELnode = *tree;
+
+    if (DELnode->left && DELnode->right)
     {
-        bst_delete(&(*tree)->left, key);
+        bst_replace_by_rightmost(DELnode, &(DELnode->left));
+        return;
+    }
+
+    if(DELnode->left && !DELnode->right)
+    {
+        *tree = DELnode->left;
+    }
+    else if (!DELnode->left && DELnode->right)
+    {
+        *tree = DELnode->right;
     }
     else
     {
-        if ((*tree)->left == NULL && (*tree)->right == NULL)
-        {
-            free(*tree);
-        }
+        *tree = NULL;
     }
+
+    free(DELnode);
 }
 
 /*
@@ -164,6 +243,15 @@ void bst_delete(bst_node_t **tree, char key) {
  * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
  */
 void bst_dispose(bst_node_t **tree) {
+    if(!*tree)
+    {
+        return;
+    }
+    bst_dispose(&((*tree)->left));
+    bst_dispose(&((*tree)->right));
+
+    free(*tree);
+    *tree = NULL;
 }
 
 /*

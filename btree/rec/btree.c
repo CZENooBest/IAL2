@@ -63,7 +63,7 @@ bool bst_search(bst_node_t *tree, char key, int *value) {
 void bst_insert(bst_node_t **tree, char key, int value) {
     if(!*tree)
     {
-        *tree = (bst_node_t *) malloc(sizeof(bst_node_t));
+        *tree = (bst_node_t *) malloc(sizeof(struct bst_node));
         if (!(*tree))
         {
             return;
@@ -73,21 +73,21 @@ void bst_insert(bst_node_t **tree, char key, int value) {
         (*tree)->value = value;
         (*tree)->left = NULL;
         (*tree)->right = NULL;
-
-        if ((*tree)->key == key)
-        {
-            (*tree)->value = value;
-            return;
-        }
-
-        if ((*tree)->key > key)
-        {
-            bst_insert(&((*tree)->left), key, value);
-            return;
-        }
-
-        bst_insert(&((*tree)->right), key, value);
     }
+
+    if ((*tree)->key == key)
+    {
+        (*tree)->value = value;
+        return;
+    }
+
+    if ((*tree)->key > key)
+    {
+        bst_insert(&((*tree)->left), key, value);
+        return;
+    }
+
+    bst_insert(&((*tree)->right), key, value);
 }
 
 /*
@@ -113,7 +113,7 @@ void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
         target->key = right_node->key;
         target->value = right_node->value;
 
-        target->left =NULL;
+        target->left = NULL;
         if (right_node->left)
         {
             target->left = right_node->left;
@@ -121,6 +121,24 @@ void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
 
         free(right_node);
     }
+
+    if (!(*tree)->right->right)
+    {
+        right_node = (*tree)->right;
+        target->key = right_node->key;
+        target->value = right_node->value;
+        (*tree)->right = NULL;
+
+        if(right_node->left)
+        {
+            (*tree)->right = right_node->left;
+        }
+
+        free(right_node);
+        return;
+    }
+
+    bst_replace_by_rightmost(target, &((*tree)->right));
 }
 
 /*
@@ -262,6 +280,14 @@ void bst_dispose(bst_node_t **tree) {
  * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
  */
 void bst_preorder(bst_node_t *tree) {
+    if(!tree)
+    {
+        return;
+    }
+
+    bst_print_node(tree);
+    bst_preorder(tree->left);
+    bst_preorder(tree->right);
 }
 
 /*
@@ -272,6 +298,14 @@ void bst_preorder(bst_node_t *tree) {
  * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
  */
 void bst_inorder(bst_node_t *tree) {
+    if (!tree)
+    {
+        return;
+    }
+
+    bst_inorder(tree->left);
+    bst_print_node(tree);
+    bst_inorder(tree->right);
 }
 /*
  * Postorder prechod stromom.
@@ -281,4 +315,12 @@ void bst_inorder(bst_node_t *tree) {
  * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
  */
 void bst_postorder(bst_node_t *tree) {
+    if (!tree)
+    {
+        return;
+    }
+
+    bst_postorder(tree->left);
+    bst_postorder(tree->right);
+    bst_print_node(tree);
 }

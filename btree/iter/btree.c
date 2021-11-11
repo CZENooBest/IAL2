@@ -280,29 +280,33 @@ void bst_delete(bst_node_t **tree, char key) {
  * vlastných pomocných funkcií.
  */
 void bst_dispose(bst_node_t **tree) {
+    if(*tree == NULL)
+    {
+        return;
+    }
+
     stack_bst_t stack;
     stack_bst_init(&stack);
-    bst_node_t *DELnode;
-    if (!*tree)
-    {
-        stack_bst_push(&stack, *tree);
-        stack_bst_pop(&stack);
-    }
+    stack_bst_push(&stack, *tree);
+
+
     while (!stack_bst_empty(&stack))
     {
-        DELnode = stack_bst_top(&stack);
+        bst_node_t *DELnode = stack_bst_top(&stack);
         stack_bst_pop(&stack);
-        if ((*tree)->left)
+        if (DELnode->left != NULL)
         {
-            stack_bst_push(&stack, (*tree)->left);
+            stack_bst_push(&stack, DELnode->left);
         }
-        if ((*tree)->right)
+        if (DELnode->right != NULL)
         {
-            stack_bst_push(&stack, (*tree)->right);
+            stack_bst_push(&stack, DELnode->right);
         }
 
         free(DELnode);
     }
+
+    bst_init(tree);
 }
 
 /*

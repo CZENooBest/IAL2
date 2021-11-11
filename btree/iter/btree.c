@@ -214,7 +214,7 @@ void bst_delete(bst_node_t **tree, char key) {
             }
             else if ((CURRENTnode->left == NULL && CURRENTnode->right != NULL) || (CURRENTnode->left != NULL && CURRENTnode->right == NULL))
             {
-                if (CURRENTnode->right != NULL && CURRENTnode->left == NULL)    //left != NULL
+                if (CURRENTnode->right != NULL && CURRENTnode->left == NULL)
                 {
                     if(PARENTnode->right == CURRENTnode)
                     {
@@ -242,13 +242,13 @@ void bst_delete(bst_node_t **tree, char key) {
             }
             else
             {
-                bst_node_t *SWAPnode = CURRENTnode->right;
+                bst_node_t *SWAPnode = CURRENTnode->left;
                 bst_node_t *SWAP_PREVnode = CURRENTnode;
 
-                while (SWAPnode->left)
+                while (SWAPnode->right)
                 {
                     SWAP_PREVnode = SWAPnode;
-                    SWAPnode = SWAPnode->left;
+                    SWAPnode = SWAPnode->right;
                 }
                 CURRENTnode->key = SWAPnode->key;
                 CURRENTnode->value = SWAPnode->value;

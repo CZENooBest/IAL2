@@ -364,6 +364,7 @@ void bst_leftmost_postorder(bst_node_t *tree, stack_bst_t *to_visit, stack_bool_
 void bst_postorder(bst_node_t *tree) {
     stack_bst_t stackBst;
     stack_bst_init(&stackBst);
+    bool TEMPbool;
 
     stack_bool_t stackBool;
     stack_bool_init(&stackBool);
@@ -374,14 +375,21 @@ void bst_postorder(bst_node_t *tree) {
         tree = stack_bst_top(&stackBst);
         stack_bst_pop(&stackBst);
 
-        if (stack_bool_top(&stackBool))
+        TEMPbool = stack_bool_top(&stackBool);
+        stack_bool_pop(&stackBool);
+        if (CURRENTnode->right != NULL && CURRENTbool)
         {
-            stack_bst_push(&stackBst, tree);
-            stack_bool_push(&stackBool, false);
-            bst_leftmost_postorder(tree->right, &stackBst, &stackBool);
-            continue;
-        }
 
-        bst_print_node(tree);
+
+                stack_bst_push(&stackBst, CURRENTnode);
+                stack_bool_push(&stackBool, false);
+
+
+            bst_leftmost_postorder(tree->right, &stackBst, &stackBool);
+        }
+        else
+        {
+            bst_print_node(CURRENTnode);
+        }
     }
 }

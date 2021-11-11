@@ -770,7 +770,7 @@ Binary tree structure:
 
 
 [test_tree_postorder] Traverse the tree using postorder
-[A,3][B,2][D,1]
+[A,3][E,5][B,2][E,5][D,1]
 Binary tree structure:
 
      +-[E,5]

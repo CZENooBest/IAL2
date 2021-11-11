@@ -183,12 +183,89 @@ void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
 void bst_delete(bst_node_t **tree, char key) {
     bst_node_t *CURRENTnode = *tree;
     bst_node_t *PARENTnode = NULL;
-    int flag = 0;
-    int i;
 
     while (CURRENTnode != NULL)
     {
         if(CURRENTnode->key > key)
+        {
+            PARENTnode = CURRENTnode;
+            CURRENTnode = CURRENTnode->left;
+        }
+        else if (CURRENTnode->key < key)
+        {
+            PARENTnode = CURRENTnode;
+            CURRENTnode = CURRENTnode->right;
+        }
+        else
+        {
+            if(CURRENTnode->left == NULL && CURRENTnode->right == NULL)
+            {
+                if(PARENTnode->left == CURRENTnode)
+                {
+                    PARENTnode->left = NULL;
+                }
+                else
+                {
+                    PARENTnode->right = NULL;
+                }
+
+                free(CURRENTnode);
+                return;
+            }
+            else if ((CURRENTnode->left == NULL && CURRENTnode->right != NULL) || (CURRENTnode->left != NULL && CURRENTnode->right == NULL))
+            {
+                if (CURRENTnode->right != NULL && CURRENTnode->left == NULL)    //left != NULL
+                {
+                    if(PARENTnode->right == CURRENTnode)
+                    {
+                        PARENTnode->right = CURRENTnode->right;
+                    }
+                    else if (PARENTnode->left == CURRENTnode)
+                    {
+                        PARENTnode->left = CURRENTnode->right;
+                    }
+                }
+                else if (CURRENTnode->left != NULL && CURRENTnode->right == NULL)
+                {
+                    if(PARENTnode->right == CURRENTnode)
+                    {
+                        PARENTnode->right = CURRENTnode->left;
+                    }
+                    else if (PARENTnode->left == CURRENTnode)
+                    {
+                        PARENTnode->left = CURRENTnode->left;
+                    }
+                }
+
+                free(CURRENTnode);
+                return;
+            }
+            else
+            {
+                bst_node_t *SWAPnode = CURRENTnode->right;
+                bst_node_t *SWAP_PREVnode = CURRENTnode;
+
+                while (SWAPnode->left)
+                {
+                    SWAP_PREVnode = SWAPnode;
+                    SWAPnode = SWAPnode->left;
+                }
+                CURRENTnode->key = SWAPnode->key;
+                CURRENTnode->value = SWAPnode->value;
+
+                if(SWAP_PREVnode->left == SWAPnode)
+                {
+                    SWAP_PREVnode->left = SWAPnode->right;
+                }
+                else if (SWAP_PREVnode->right == SWAPnode)
+                {
+                    SWAP_PREVnode->right = SWAPnode->right;
+                }
+
+                free(SWAPnode);
+                return;
+            }
+        }
     }
 }
 

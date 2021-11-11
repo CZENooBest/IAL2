@@ -181,41 +181,14 @@ void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
  * použitia vlastných pomocných funkcií.
  */
 void bst_delete(bst_node_t **tree, char key) {
-    if (*tree == NULL)
+    bst_node_t *CURRENTnode = *tree;
+    bst_node_t *PARENTnode = NULL;
+    int flag = 0;
+    int i;
+
+    while (CURRENTnode != NULL)
     {
-        return;
-    }
-
-    stack_bst_t stack;
-    stack_bst_init(&stack);
-    stack_bst_push(&stack, *tree);
-
-    while (!stack_bst_empty(&stack))
-    {
-        bst_node_t *TEMPnode = stack_bst_top(&stack);
-        stack_bst_pop(&stack);
-
-        if(TEMPnode->key == key)
-        {
-            bst_node_t *CURRENTnode = *tree;
-            bst_node_t *PREVIOUSnode;
-
-            while (CURRENTnode->right != NULL)
-            {
-                PREVIOUSnode = CURRENTnode;
-                CURRENTnode = CURRENTnode->right;
-            }
-
-            TEMPnode->key = CURRENTnode->key;
-            PREVIOUSnode->right = NULL;
-            free(CURRENTnode);
-            return;
-        }
-
-        if (TEMPnode->left != NULL)
-            stack_bst_push(&stack, TEMPnode->left);
-        if (TEMPnode->right != NULL)
-            stack_bst_push(&stack, TEMPnode->right);
+        if(CURRENTnode->key > key)
     }
 }
 

@@ -65,28 +65,21 @@ bool bst_search(bst_node_t *tree, char key, int *value) {
  * Funkciu implementujte iteratívne bez použitia vlastných pomocných funkcií.
  */
 void bst_insert(bst_node_t **tree, char key, int value) {
-    bst_node_t *after = NULL;
-    bst_node_t *iterator = *tree;
+    bst_node_t *CURRENTnode = *tree;
+    bst_node_t *PREVIOUSnode = NULL;
 
-    while (iterator)
+    while (CURRENTnode != NULL)
     {
-        after = iterator;
+        PREVIOUSnode = CURRENTnode;
 
-        if (key < iterator->key)
+        if (key < CURRENTnode->key)
         {
-            iterator = iterator->left;
-            continue;
-        }
-        else if (key > iterator->key)
-        {
-            iterator = iterator->right;
-            continue;
+            CURRENTnode = CURRENTnode->left;
         }
         else
         {
-            return;
+            CURRENTnode = CURRENTnode->right;
         }
-
     }
 
     bst_node_t *NEWnode = (bst_node_t *) malloc(sizeof(struct bst_node));
@@ -100,17 +93,28 @@ void bst_insert(bst_node_t **tree, char key, int value) {
     NEWnode->left = NULL;
     NEWnode->right = NULL;
 
-    if (!after)
+    if (PREVIOUSnode == NULL)
     {
         *tree = NEWnode;
         return;
     }
-    if(key < after->key)
+
+    if(key < PREVIOUSnode->key)
     {
-        after->left = NEWnode;
+        PREVIOUSnode->left = NEWnode;
         return;
     }
-    after->right = NEWnode;
+
+    if (key > PREVIOUSnode->key)
+    {
+        PREVIOUSnode->right = NEWnode;
+        return;
+    }
+
+    if (key == PREVIOUSnode->key)
+    {
+        PREVIOUSnode->value = NEWnode->value;
+    }
 }
 
 /*
@@ -127,46 +131,21 @@ void bst_insert(bst_node_t **tree, char key, int value) {
  * Funkciu implementujte iteratívne bez použitia vlastných pomocných funkcií.
  */
 void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
-    bst_node_t *right_node;
-    bst_node_t *iterator = *tree;
-
-    while (iterator)
+    if((*tree)->right != NULL)
     {
-        if((iterator)->right == NULL)
-        {
-            right_node = iterator;
+        bst_replace_by_rightmost(target, &((*tree)->right));
+    }
+    else
+    {
+        target->key = (*tree)->key;
+        target->value = (*tree)->value;
 
-            target->key = right_node->key;
-            target->value = right_node->value;
-
-            target->left = NULL;
-            if (right_node->left)
-            {
-                target->left = right_node->left;
-            }
-
-            free(right_node);
-        }
-
-        if (!(iterator)->right->right)
-        {
-            right_node = (iterator)->right;
-            target->key = right_node->key;
-            target->value = right_node->value;
-            (iterator)->right = NULL;
-
-            if(right_node->left)
-            {
-                (iterator)->right = right_node->left;
-            }
-
-            free(right_node);
-            return;
-        }
-
-        iterator = (iterator)->right;
+        bst_node_t *NEXTnode = (*tree)->left;
+        free(*tree);
+        *tree = NEXTnode;
     }
 }
+
 
 /*
  * Odstránenie uzlu v strome.

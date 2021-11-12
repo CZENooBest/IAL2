@@ -26,7 +26,7 @@ Binary tree structure:
 
 Binary tree structure:
 
-  +-[H,1]
+  +-[H,8]
 
 
 [test_tree_insert_many] Insert many values

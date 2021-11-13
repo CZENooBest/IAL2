@@ -160,101 +160,89 @@ void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
  * použitia vlastných pomocných funkcií.
  */
 void bst_delete(bst_node_t **tree, char key) {
-    if(*tree == NULL)
-    {
+    bst_node_t *p = *tree;
+    bst_node_t *parent = NULL;
+    bst_node_t *replace;
+    bst_node_t *replace_parent;
+
+    while (p != NULL && key != p->key) {
+        parent = p;
+        if (key < p->key) {
+            p = p->left;
+        } else {
+            p = p->right;
+        }
+    }
+
+    // If the node to delete was not found, signal failure.
+    if (p == NULL) {
         return;
     }
 
-    bst_node_t *DELnode;
-
-    if (key < (*tree)->key)
+    if (p->left == NULL)
+        // Case 1a: p has no children. Replace p with its right child
+        // (which is nullptr).
+        //   - or -
+        // Case 1b: p has no left child but has a right child. Replace
+        // p with its right child.
     {
-        if ((*tree)->left && (*tree)->left->key == key)
+        replace = p->right;
+    } else if (p->right == NULL)
+        // Case 2: p has a left child but no right child. Replace p
+        // with its left child.
+    {
+        replace = p->left;
+    }
+    else
+        // Case 3: p has two children. Replace p with its inorder predecessor.
+
+        // Go left...
+    {
+        replace_parent = p;
+        replace = p->left;
+
+    // ...then all the way to the right.
+        while (replace->right != NULL)
         {
-            DELnode = (*tree)->left;
-
-            if (DELnode->left && DELnode->right)
-            {
-                bst_replace_by_rightmost(DELnode, &(DELnode->left));
-                return;
-            }
-
-            if (DELnode->left && !DELnode->right)
-            {
-                (*tree)->left = DELnode->left;
-            }
-            else if (!DELnode->left && DELnode->right)
-            {
-                (*tree)->left = DELnode->right;
-            }
-            else
-            {
-                (*tree)->left = NULL;
-            }
-
-            free(DELnode);
-            return;
+            replace_parent = replace;
+            replace = replace->right;
         }
 
-        bst_delete(&((*tree)->left), key);
-        return;
-    }
-
-    if (key > (*tree)->key)
-    {
-        if ((*tree)->right && (*tree)->right->key == key)
+    // If we were able to go to the right, make the replacement node's
+    // left child the right child of its parent. Then make the left child
+    // of p the replacement's left child.
+        if (replace_parent != p)
         {
-            DELnode = (*tree)->right;
-
-            if (DELnode->left && DELnode->right)
-            {
-                bst_replace_by_rightmost(DELnode, &(DELnode->left));
-                return;
-            }
-
-            if (DELnode->left && !DELnode->right)
-            {
-                (*tree)->right = DELnode->left;
-            }
-            else if (!DELnode->left && DELnode->right)
-            {
-                (*tree)->right = DELnode->right;
-            }
-            else
-            {
-                (*tree)->right = NULL;
-            }
-
-            free(DELnode);
-            return;
+            replace_parent->right = replace->left;
+            replace->left = p->left;
         }
 
-        bst_delete(&((*tree)->right), key);
-        return;
+        // Make the right child of p the replacement's right child.
+        replace->right = p->right;
     }
 
-    DELnode = *tree;
 
-    if (DELnode->left && DELnode->right)
+        // Connect replacement node to the parent node of p (or the root if p has no parent).
+        if (parent == NULL)
     {
-        bst_replace_by_rightmost(DELnode, &(DELnode->left));
-        return;
-    }
-
-    if(DELnode->left && !DELnode->right)
-    {
-        *tree = DELnode->left;
-    }
-    else if (!DELnode->left && DELnode->right)
-    {
-        *tree = DELnode->right;
+           *tree = replace;
     }
     else
     {
-        *tree = NULL;
+        if (p->key < parent->key)
+        {
+            parent->left = replace;
+        }
+        else
+        {
+            parent->right = replace;
+        }
     }
 
-    free(DELnode);
+        // Delete the node, decrement the tree size, and signal success.
+    free(p);
+
+    return;
 }
 
 /*

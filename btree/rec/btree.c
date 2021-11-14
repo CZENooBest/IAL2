@@ -36,14 +36,15 @@ bool bst_search(bst_node_t *tree, char key, int *value) {
         return false;
     }
 
+    if (key < tree->key)
+    {
+        return bst_search(tree->left, key, value);
+    }
+
     if (tree->key == key)
     {
         *value = tree->value;
         return true;
-    }
-    if (key < tree->key)
-    {
-        return bst_search(tree->left, key, value);
     }
 
     return bst_search(tree->right, key, value);
@@ -75,15 +76,15 @@ void bst_insert(bst_node_t **tree, char key, int value) {
         (*tree)->right = NULL;
     }
 
-    if ((*tree)->key == key)
-    {
-        (*tree)->value = value;
-        return;
-    }
-
     if ((*tree)->key > key)
     {
         bst_insert(&((*tree)->left), key, value);
+        return;
+    }
+
+    if ((*tree)->key == key)
+    {
+        (*tree)->value = value;
         return;
     }
 

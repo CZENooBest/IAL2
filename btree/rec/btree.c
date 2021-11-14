@@ -120,7 +120,7 @@ void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
     {
         TMPkey = (*tree)->key;
         TMPvalue = (*tree)->value;
-        bst_delete(RootPtr, TMPkey);
+        bst_delete(tree, TMPkey);
         target->key = TMPkey;
         target->value = TMPvalue;
     }
@@ -149,7 +149,7 @@ void bst_delete(bst_node_t **tree, char key) {
     {
         bst_delete(&(*tree)->right, key);
     }
-    else if (key < (*tree)->Key)
+    else if (key < (*tree)->key)
     {
         bst_delete(&(*tree)->left, key);
     }

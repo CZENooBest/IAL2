@@ -131,23 +131,7 @@ void bst_insert(bst_node_t **tree, char key, int value) {
  * Funkciu implementujte iteratívne bez použitia vlastných pomocných funkcií.
  */
 void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
-    bst_node_t replace_parent = *tree;
-    bst_node_t replace = (*tree)->left;
 
-    while (replace->right != NULL)
-    {
-        replace_parent = replace;
-        replace = replace->right;
-    }
-
-    if (replace_parent != *tree)
-    {
-        replace_parent->right = replace->left;
-        replace->left = p->left;
-    }
-
-    // Make the right child of p the replacement's right child.
-    replace->right = (*tree)->right;
 }
 
 
@@ -191,8 +175,7 @@ void bst_delete(bst_node_t **tree, char key) {
         // p with its right child.
     {
         replace = p->right;
-    }
-    else if (p->right == NULL)
+    } else if (p->right == NULL)
         // Case 2: p has a left child but no right child. Replace p
         // with its left child.
     {
@@ -203,14 +186,34 @@ void bst_delete(bst_node_t **tree, char key) {
 
         // Go left...
     {
-        bst_replace_by_rightmost(p, *p->left);
+        replace_parent = p;
+        replace = p->left;
+
+        // ...then all the way to the right.
+        while (replace->right != NULL)
+        {
+            replace_parent = replace;
+            replace = replace->right;
+        }
+
+        // If we were able to go to the right, make the replacement node's
+        // left child the right child of its parent. Then make the left child
+        // of p the replacement's left child.
+        if (replace_parent != p)
+        {
+            replace_parent->right = replace->left;
+            replace->left = p->left;
+        }
+
+        // Make the right child of p the replacement's right child.
+        replace->right = p->right;
     }
 
 
     // Connect replacement node to the parent node of p (or the root if p has no parent).
     if (parent == NULL)
     {
-           *tree = replace;
+        *tree = replace;
     }
     else
     {
@@ -224,12 +227,11 @@ void bst_delete(bst_node_t **tree, char key) {
         }
     }
 
-        // Delete the node, decrement the tree size, and signal success.
+    // Delete the node, decrement the tree size, and signal success.
     free(p);
 
     return;
 }
-
 /*
  * Zrušenie celého stromu.
  *

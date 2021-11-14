@@ -132,14 +132,6 @@ void bst_insert(bst_node_t **tree, char key, int value) {
  */
 void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
 
-    if (replace_parent != *tree)
-    {
-        replace_parent->right = replace->left;
-        replace->left = p->left;
-    }
-
-    // Make the right child of p the replacement's right child.
-    replace->right = (*tree)->right;
 }
 
 

@@ -227,7 +227,7 @@ void bst_delete(bst_node_t **tree, char key) {
         }
     }
 
-    // Delete the node, decrement the tree size, and signal success.
+
     free(p);
 
     return;

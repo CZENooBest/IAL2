@@ -131,7 +131,28 @@ void bst_insert(bst_node_t **tree, char key, int value) {
  * Funkciu implementujte iteratívne bez použitia vlastných pomocných funkcií.
  */
 void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
+    char TMPkey;
+    int TMPvalue;
 
+    if (*tree == NULL || target == NULL)
+    {
+        return;	// Osetreni chyboveho stavu
+    }
+        // Dostani se k nejpravejsimu uzlu
+    else if ((*tree)->right != NULL)
+    {
+        bst_replace_by_rightmost(target, &(*tree)->right);
+    }
+    else
+    {	// Samotne mazani
+        TMPkey = (*tree)->key;
+        TMPvalue = (*tree)->value;
+
+        bst_delete(RootPtr, TMPkey);
+
+        target->key = TMPkey;
+        target->value = TMPvalue;
+    }
 }
 
 
@@ -148,89 +169,58 @@ void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
  * použitia vlastných pomocných funkcií.
  */
 void bst_delete(bst_node_t **tree, char key) {
-    bst_node_t *NODE = *tree;
-    bst_node_t *PARENTnode = NULL;
-    bst_node_t *REPLACEnode;
-    bst_node_t *REPLACE_PARnode;
+    bst_node_t *TMPnode;
 
-    while (NODE != NULL && key != NODE->key) {
-        PARENTnode = NODE;
-        if (key < NODE->key) {
-            NODE = NODE->left;
-        } else {
-            NODE = NODE->right;
-        }
-    }
-
-    // If the node to delete was not found, signal failure.
-    if (NODE == NULL) {
-        return;
-    }
-
-    if (NODE->left == NULL)
-        // Case 1a: p has no children. Replace p with its right child
-        // (which is nullptr).
-        //   - or -
-        // Case 1b: p has no left child but has a right child. Replace
-        // p with its right child.
+    if (*tree == NULL)
     {
-        REPLACEnode = NODE->right;
-    } else if (NODE->right == NULL)
-        // Case 2: p has a left child but no right child. Replace p
-        // with its left child.
+        return;	// Uzel s klicem ve stromu neni, nedelam nic
+    }
+        // Pokud je klic mensi nez v aktualnim uzlu, volam znovu funcki s levym synem
+    else if (key < (*tree)->Key)
     {
-        REPLACEnode = NODE->left;
+        bst_delete(&(*tree)->left, key);
+    }
+        // Pokud je klic vetsi nez v aktualnim uzlu, volam znovu funcki s pravym synem
+    else if (key > (*tree)->key)
+    {
+        bst_delete(&(*tree)->right, key);
     }
     else
-        // Case 3: p has two children. Replace p with its inorder predecessor.
-
-        // Go left...
-    {
-        REPLACE_PARnode = NODE;
-        REPLACEnode = NODE->left;
-
-        // ...then all the way to the right.
-        while (REPLACEnode->right != NULL)
+    {	// Nasel jsem uzel ke smazani
+        // Uzel nema zadne syny, jednoduse jej uvolnim
+        if ((*tree)->left == NULL && (*tree)->right == NULL)
         {
-            REPLACE_PARnode = REPLACEnode;
-            REPLACEnode = REPLACEnode->right;
+            free (*tree);
+            *tree = NULL;
         }
-
-        // If we were able to go to the right, make the replacement node's
-        // left child the right child of its parent. Then make the left child
-        // of p the replacement's left child.
-        if (REPLACEnode != NODE)
+            // Uzel ma jen leveho syna, uzel uvolnim a na jeho misto dam adresu syna
+        else if ((*tree)->left != NULL && (*tree)->right == NULL)
         {
-            REPLACE_PARnode->right = REPLACEnode->left;
-            REPLACEnode->left = NODE->left;
+            TMPnode = (*tree)->left;
+            free (*tree);
+            *tree = TMPnode;
         }
-
-        // Make the right child of p the replacement's right child.
-        REPLACEnode->right = NODE->right;
-    }
-
-
-    // Connect replacement node to the parent node of p (or the root if p has no parent).
-    if (PARENTnode == NULL)
-    {
-        *tree = REPLACEnode;
-    }
-    else
-    {
-        if (NODE->key < PARENTnode->key)
+            // Uzel ma jen praveho syna, uzel uvolnim a na jeho misto dam adresu syna
+        else if ((*tree)->left == NULL && (*tree)->right != NULL)
         {
-            PARENTnode->left = REPLACEnode;
+            TMPnode = (*tree)->right;
+            free (*tree);
+            *tree = TMPnode;
         }
-        else
-        {
-            PARENTnode->right = REPLACEnode;
+            // Uzel ma oba syny, je to peklo
+        else {
+            // Jako uzel, ktery ma odstranovany nahradit se zasle pravy uzel leveho podstromu jen pokud existuje
+            if ((*tree)->left->right != NULL)
+            {
+                bst_replace_by_rightmost(*tree, &(*tree)->left->right);
+            }
+                // Jinak se zasle koren leveho podstromu
+            else
+            {
+                bst_replace_by_rightmost(*tree, &(*tree)->left);
+            }
         }
     }
-
-
-    free(NODE);
-
-    return;
 }
 /*
  * Zrušenie celého stromu.

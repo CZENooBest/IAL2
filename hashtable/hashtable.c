@@ -102,16 +102,21 @@ void ht_insert(ht_table_t *table, char *key, float value) {
  * Pri implementácii využite funkciu ht_search.
  */
 float *ht_get(ht_table_t *table, char *key) {
-    ht_item_t *hash_item = ht_search(table, key);    //hledání prvku s klíčem key
-    while(hash_item != NULL)
+    ht_item_t *hash_item;
+
+    if (table == NULL || key == NULL)
     {
-        if(!strcmp(hash_item->key, key))
-        {
-            return hash_item->data;
-        }
-        hash_item = hash_item->next;
+        return NULL;  // Osetreni chyb
     }
-    return NULL;
+
+    if ((hash_item = ht_search(table, key)) != NULL)
+    {
+        return &hash_item->value;
+    }
+    else
+    {
+        return NULL;
+    }
 }
 
 /*

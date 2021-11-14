@@ -18,7 +18,7 @@
  * možné toto detegovať vo funkcii.
  */
 void bst_init(bst_node_t **tree){
-    *tree = NULL;
+    *tree = NULL;  //tree na hodnotu NULL
 }
 
 /*
@@ -31,23 +31,23 @@ void bst_init(bst_node_t **tree){
  * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
  */
 bool bst_search(bst_node_t *tree, char key, int *value) {
-    if(tree == NULL)
+    if(tree == NULL)    //kontrola jestli máme strom
     {
         return false;
     }
 
-    if (key < tree->key)
+    if (key < tree->key)    //pokud je hledaný klíč menší než klíč ve stromu
     {
-        return bst_search(tree->left, key, value);
+        return bst_search(tree->left, key, value);  //posuneme se o hodnotu doleva
     }
 
-    if (tree->key == key)
+    if (tree->key == key)   //pokud se hledaný klíč rovná klíči ve stromu
     {
-        *value = tree->value;
-        return true;
+        *value = tree->value;   //uložíme hodnotu
+        return true;            //vracíme NULL
     }
 
-    return bst_search(tree->right, key, value);
+    return bst_search(tree->right, key, value);     //nic z předešlého neplatí takže se posuneme doprava
 }
 
 /*
@@ -62,33 +62,33 @@ bool bst_search(bst_node_t *tree, char key, int *value) {
  * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
  */
 void bst_insert(bst_node_t **tree, char key, int value) {
-    if(!*tree)
+    if(!*tree)  //kontrola jestli máme strom
     {
         *tree = (bst_node_t *) malloc(sizeof(struct bst_node));
         if (!(*tree))
         {
-            return;
+            return; //nezdařil se malloc
         }
 
-        (*tree)->key = key;
-        (*tree)->value = value;
-        (*tree)->left = NULL;
-        (*tree)->right = NULL;
+        (*tree)->key = key;         //
+        (*tree)->value = value;     //
+        (*tree)->left = NULL;       //nový element
+        (*tree)->right = NULL;      //
     }
 
-    if ((*tree)->key > key)
+    if ((*tree)->key > key)     //pokud je hledaný klíč menší než klíč
     {
-        bst_insert(&((*tree)->left), key, value);
+        bst_insert(&((*tree)->left), key, value);   //posunu se doleva
         return;
     }
 
-    if ((*tree)->key == key)
+    if ((*tree)->key == key)    //pokud je hledaný klíč rovný klíči
     {
-        (*tree)->value = value;
+        (*tree)->value = value;     //přepíšu value
         return;
     }
 
-    bst_insert(&((*tree)->right), key, value);
+    bst_insert(&((*tree)->right), key, value);  //nic z toho předtím takže se posunu doprava
 }
 
 /*
@@ -105,37 +105,36 @@ void bst_insert(bst_node_t **tree, char key, int value) {
  * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
  */
 void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
-    bst_node_t *right_node;
+    bst_node_t *RIGHTnode;
 
-    if((*tree)->right == NULL)
+    if((*tree)->right == NULL)  //kontrola jestli můžu jít doprava
     {
-        right_node = *tree;
-
-        target->key = right_node->key;
-        target->value = right_node->value;
+        RIGHTnode = *tree;                  // nemůžu takže uložím tree na nejpravější
+        target->key = RIGHTnode->key;       //
+        target->value = RIGHTnode->value;   //
 
         target->left = NULL;
-        if (right_node->left)
+        if (RIGHTnode->left)
         {
-            target->left = right_node->left;
+            target->left = RIGHTnode->left;  //pokud má nejpravější levou větev
         }
 
-        free(right_node);
+        free(RIGHTnode);
     }
 
-    if (!(*tree)->right->right)
+    if (!(*tree)->right->right)     //kontrola jestli pravý pravého není NULL
     {
-        right_node = (*tree)->right;
-        target->key = right_node->key;
-        target->value = right_node->value;
+        RIGHTnode = (*tree)->right;        //
+        target->key = RIGHTnode->key;      // přepsání hodnoty
+        target->value = RIGHTnode->value;  //
         (*tree)->right = NULL;
 
-        if(right_node->left)
+        if(RIGHTnode->left)
         {
-            (*tree)->right = right_node->left;
+            (*tree)->right = RIGHTnode->left;
         }
 
-        free(right_node);
+        free(RIGHTnode);
         return;
     }
 

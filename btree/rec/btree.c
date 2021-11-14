@@ -105,40 +105,25 @@ void bst_insert(bst_node_t **tree, char key, int value) {
  * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
  */
 void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
-    bst_node_t *RIGHTnode;
+    char TMPkey;
+    int TMPvalue;
 
-    if((*tree)->right == NULL)  //kontrola jestli můžu jít doprava
+    if (*tree == NULL || target == NULL)
     {
-        RIGHTnode = *tree;                  // nemůžu takže uložím tree na nejpravější
-        target->key = RIGHTnode->key;       //
-        target->value = RIGHTnode->value;   //
-
-        target->left = NULL;
-        if (RIGHTnode->left)
-        {
-            target->left = RIGHTnode->left;  //pokud má nejpravější levou větev
-        }
-
-        free(RIGHTnode);
-    }
-
-    if (!(*tree)->right->right)     //kontrola jestli pravý pravého není NULL
-    {
-        RIGHTnode = (*tree)->right;        //
-        target->key = RIGHTnode->key;      // přepsání hodnoty
-        target->value = RIGHTnode->value;  //
-        (*tree)->right = NULL;
-
-        if(RIGHTnode->left)
-        {
-            (*tree)->right = RIGHTnode->left;
-        }
-
-        free(RIGHTnode);
         return;
     }
-
-    bst_replace_by_rightmost(target, &((*tree)->right));
+    else if ((*tree)->right != NULL)
+    {
+        bst_replace_by_rightmost(target, &(*tree)->right);
+    }
+    else
+    {
+        TMPkey = (*tree)->key;
+        TMPvalue = (*tree)->value;
+        bst_delete(RootPtr, TMPkey);
+        target->key = TMPkey;
+        target->value = TMPvalue;
+    }
 }
 
 /*
@@ -154,101 +139,51 @@ void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
  * použitia vlastných pomocných funkcií.
  */
 void bst_delete(bst_node_t **tree, char key) {
-    if(*tree == NULL)
+    bst_node_t *TMPnode;
+
+    if (*tree == NULL)
     {
         return;
     }
-
-    bst_node_t *DELnode;
-
-    if (key < (*tree)->key)
+    else if (key > (*tree)->key)
     {
-        if ((*tree)->left && (*tree)->left->key == key)
-        {
-            DELnode = (*tree)->left;
-
-            if (DELnode->left && DELnode->right)
-            {
-                bst_replace_by_rightmost(DELnode, &(DELnode->left));
-                return;
-            }
-
-            if (DELnode->left && !DELnode->right)
-            {
-                (*tree)->left = DELnode->left;
-            }
-            else if (!DELnode->left && DELnode->right)
-            {
-                (*tree)->left = DELnode->right;
-            }
-            else
-            {
-                (*tree)->left = NULL;
-            }
-
-            free(DELnode);
-            return;
-        }
-
-        bst_delete(&((*tree)->left), key);
-        return;
+        bst_delete(&(*tree)->right, key);
     }
-
-    if (key > (*tree)->key)
+    else if (key < (*tree)->Key)
     {
-        if ((*tree)->right && (*tree)->right->key == key)
-        {
-            DELnode = (*tree)->right;
-
-            if (DELnode->left && DELnode->right)
-            {
-                bst_replace_by_rightmost(DELnode, &(DELnode->left));
-                return;
-            }
-
-            if (DELnode->left && !DELnode->right)
-            {
-                (*tree)->right = DELnode->left;
-            }
-            else if (!DELnode->left && DELnode->right)
-            {
-                (*tree)->right = DELnode->right;
-            }
-            else
-            {
-                (*tree)->right = NULL;
-            }
-
-            free(DELnode);
-            return;
-        }
-
-        bst_delete(&((*tree)->right), key);
-        return;
-    }
-
-    DELnode = *tree;
-
-    if (DELnode->left && DELnode->right)
-    {
-        bst_replace_by_rightmost(DELnode, &(DELnode->left));
-        return;
-    }
-
-    if(DELnode->left && !DELnode->right)
-    {
-        *tree = DELnode->left;
-    }
-    else if (!DELnode->left && DELnode->right)
-    {
-        *tree = DELnode->right;
+        bst_delete(&(*tree)->left, key);
     }
     else
     {
-        *tree = NULL;
+        if ((*tree)->left == NULL && (*tree)->right == NULL)
+        {
+            free (*tree);
+            *tree = NULL;
+        }
+        else if ((*tree)->left == NULL && (*tree)->right != NULL)
+        {
+            TMPnode = (*tree)->right;
+            free (*tree);
+            *tree = TMPnode;
+        }
+        else if ((*tree)->left != NULL && (*tree)->right == NULL)
+        {
+            TMPnode = (*tree)->left;
+            free (*tree);
+            *tree = TMPnode;
+        }
+        else
+        {
+            if ((*tree)->left->right != NULL)
+            {
+                bst_replace_by_rightmost(*tree, &(*tree)->left->right);
+            }
+            else
+            {
+                bst_replace_by_rightmost(*tree, &(*tree)->left);
+            }
+        }
     }
-
-    free(DELnode);
 }
 
 /*

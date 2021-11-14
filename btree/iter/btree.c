@@ -162,55 +162,38 @@ void bst_delete(bst_node_t **tree, char key) {
         }
     }
 
-    // If the node to delete was not found, signal failure.
     if (NODE == NULL) {
         return;
     }
 
     if (NODE->left == NULL)
-        // Case 1a: p has no children. Replace p with its right child
-        // (which is nullptr).
-        //   - or -
-        // Case 1b: p has no left child but has a right child. Replace
-        // p with its right child.
     {
         REPLACEnode = NODE->right;
-    } else if (NODE->right == NULL)
-        // Case 2: p has a left child but no right child. Replace p
-        // with its left child.
+    }
+    else if (NODE->right == NULL)
     {
         REPLACEnode = NODE->left;
     }
     else
-        // Case 3: p has two children. Replace p with its inorder predecessor.
-
-        // Go left...
     {
         REPLACE_PARnode = NODE;
         REPLACEnode = NODE->left;
 
-        // ...then all the way to the right.
         while (REPLACEnode->right != NULL)
         {
             REPLACE_PARnode = REPLACEnode;
             REPLACEnode = REPLACEnode->right;
         }
 
-        // If we were able to go to the right, make the replacement node's
-        // left child the right child of its parent. Then make the left child
-        // of p the replacement's left child.
         if (REPLACEnode != NODE)
         {
             REPLACE_PARnode->right = REPLACEnode->left;
             REPLACEnode->left = NODE->left;
         }
 
-        // Make the right child of p the replacement's right child.
         REPLACEnode->right = NODE->right;
     }
 
-
-    // Connect replacement node to the parent node of p (or the root if p has no parent).
     if (PARENTnode == NULL)
     {
         *tree = REPLACEnode;
@@ -228,7 +211,6 @@ void bst_delete(bst_node_t **tree, char key) {
     }
 
     free(NODE);
-
     return;
 }
 /*
